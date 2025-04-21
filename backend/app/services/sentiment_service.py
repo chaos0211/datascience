@@ -1,9 +1,10 @@
 import joblib
 import os
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-MODEL_PATH = os.path.join(BASE_DIR, "data_processing", "models", "naive_bayes_model.pkl")
-VEC_PATH = os.path.join(BASE_DIR, "data_processing", "models", "tfidf_vectorizer.pkl")
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../'))
+
+MODEL_PATH = os.path.join(BASE_DIR, 'data_processing', 'models', 'naive_bayes_model.pkl')
+VEC_PATH = os.path.join(BASE_DIR, 'data_processing', 'models', 'tfidf_vectorizer.pkl')
 
 model = joblib.load(MODEL_PATH)
 vectorizer = joblib.load(VEC_PATH)

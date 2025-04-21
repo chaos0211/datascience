@@ -1,6 +1,22 @@
-from flask import Flask, render_template, send_from_directory
-import os
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Twitter Sentiment Analysis</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Twitter 情感分析系统</h1>
+    <textarea id="inputText" placeholder="请输入推文内容..."></textarea>
+    <button onclick="analyze()">开始分析</button>
 
-@app.route('/')
-def index():
-    return send_from_directory(os.path.join(app.root_path, '..', 'frontend'), 'index.html')
+    <div id="resultBox">
+      <h3>分析结果：</h3>
+      <p id="resultText">（等待分析）</p>
+    </div>
+  </div>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

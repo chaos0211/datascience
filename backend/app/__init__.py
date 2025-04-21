@@ -24,11 +24,14 @@ def create_app():
     # ✅ 添加前端首页页面支持
     @app.route('/')
     def index():
-        return send_from_directory(os.path.join(app.root_path, '..', 'frontend'), 'index.html')
 
-    # ✅ 添加静态资源访问（JS/CSS）
+        frontend_path = os.path.abspath(os.path.join(app.root_path, '..', '..', 'frontend'))
+        return send_from_directory(frontend_path, 'index.html')
+
+    # 提供静态资源访问（如 JS/CSS）
     @app.route('/<path:filename>')
     def static_files(filename):
-        return send_from_directory(os.path.join(app.root_path, '..', 'frontend'), filename)
+        frontend_path = os.path.abspath(os.path.join(app.root_path, '..', '..', 'frontend'))
+        return send_from_directory(frontend_path, filename)
 
     return app

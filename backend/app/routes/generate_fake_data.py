@@ -16,38 +16,40 @@ fake_bp = Blueprint('fake_data', __name__)
 def generate_fake_data_logic():
     # 定义两个事件
     events = [
-        {"name": "TechPhone", "date": "2025-04-14"},
-        {"name": "Movie", "date": "2025-04-15"}
+        {"name": "TechPhone", "date": "2025-03-01"},
+        {"name": "Movie", "date": "2025-03-02"}
     ]
     comment_templates = {
         1: [  # 正面
             "Love the {feature} of {event}, {adjective}!",
-            "{event} is {adjective}, highly recommend!"
+            "{event} is {adjective}, highly recommend!",
+            "Really impressed with {event}'s {feature}!",
+            "{event} exceeded my expectations, {adjective}!"
         ],
         0: [  # 负面
             "{issue} with {event}, so {adjective}!",
-            "{event}’s {feature} is {adjective}, very disappointed."
-        ],
-        None: [  # 中性（由模型决定）
-            "What’s the {feature} like on {event}?",
-            "Just got {event}, testing the {feature} now."
+            "{event}’s {feature} is {adjective}, very disappointed.",
+            "Not happy with {event}, {issue}.",
+            "{event} was {adjective}, wouldn’t recommend."
         ]
     }
-    features = ["camera", "battery", "design", "screen", "performance"]
-    positive_adjectives = ["awesome", "fantastic", "great", "amazing"]
-    negative_adjectives = ["disappointing", "terrible", "frustrating", "bad"]
-    issues = ["Battery drains fast", "Too expensive", "Shipping delayed", "Screen flickers"]
+    features = ["camera", "battery", "design", "screen", "performance", "price", "software"]
+    positive_adjectives = ["awesome", "fantastic", "great", "amazing", "excellent", "superb"]
+    negative_adjectives = ["disappointing", "terrible", "frustrating", "bad", "poor", "awful"]
+    issues = [
+        "Battery drains fast", "Too expensive", "Shipping delayed",
+        "Screen flickers", "Overheats", "Software glitches", "Poor quality"
+    ]
 
     logger.info("Starting fake data generation")
 
-    # 生成 350 条评论
-    for day in range(7):
-        date = (datetime(2025, 4, 14) + timedelta(days=day)).strftime("%Y-%m-%d")
-        sentiment_weights = [0.50, 0.20, 0.30] if day == 2 else [0.30, 0.30, 0.40]  # [负, 正, 中]
-
+    # 生成 30 天数据
+    for day in range(30):
+        date = datetime(2025, 3, 1) + timedelta(days=day)
         for _ in range(50):  # 每天50条
             event = random.choice(events)
-            sentiment = random.choices([0, 1, None], weights=sentiment_weights, k=1)[0]
+            # 随机选择正面或负面（40% 正面，60% 负面）
+            sentiment = random.choices([0, 1], weights=[0.60, 0.40], k=1)[0]
             template = random.choice(comment_templates[sentiment])
             comment = template.format(
                 event=event["name"],
@@ -56,36 +58,33 @@ def generate_fake_data_logic():
                 issue=random.choice(issues) if sentiment == 0 else ""
             )
 
-            # 创建新的 EventComment
+            # 创建 EventComment
             event_comment = EventComment(
                 event_name=event["name"],
                 event_date=datetime.strptime(event["date"], "%Y-%m-%d").date(),
                 comment=comment,
                 comment_date=datetime.strptime(
-                    f"{date} {random.randint(0, 23):02d}:{random.randint(0, 59):02d}:00",
+                    f"{date.strftime('%Y-%m-%d')} {random.randint(0, 23):02d}:{random.randint(0, 59):02d}:00",
                     "%Y-%m-%d %H:%M:%S"
                 )
             )
             db.session.add(event_comment)
             db.session.flush()
 
-            # 创建 SentimentResult
-            sentiment_data = analyze_sentiment(comment)
-            sentiment_code = sentiment_data.get("code")
-            if sentiment_code == 2:
-                sentiment_code = 1
-
+            # 创建 SentimentResult（直接使用随机 sentiment，避免 analyze_sentiment 偏差）
             sentiment_result = SentimentResult(
                 event_id=event_comment.id,
-                sentiment=sentiment_code,
+                sentiment=sentiment,
                 comment_date=event_comment.comment_date
             )
             db.session.add(sentiment_result)
-            logger.debug(f"Generated comment: {comment} | Sentiment: {sentiment_code} | Event ID: {event_comment.id}")
+            logger.debug(f"Generated comment: {comment} | Sentiment: {sentiment} | Event ID: {event_comment.id}")
 
     db.session.commit()
-    logger.info(f"Fake data generation completed. Events Comments: {EventComment.query.count()}, Sentiment Results: {SentimentResult.query.count()}")
-
+    # 统计情绪分布
+    negative_count = SentimentResult.query.filter_by(sentiment=0).count()
+    positive_count = SentimentResult.query.filter_by(sentiment=1).count()
+    logger.info(f"Fake data generation completed. Events Comments: {EventComment.query.count()}, Sentiment Results: {SentimentResult.query.count()}, Negative: {negative_count}, Positive: {positive_count}")
 
 @fake_bp.route('/api/generate_fake_data', methods=['POST'])
 def generate_fake_data():

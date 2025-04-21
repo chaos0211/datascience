@@ -37,19 +37,26 @@ def get_model_metrics():
 @monitor_bp.route('/trend/<int:event_id>', methods=['GET'])
 def trend_data(event_id):
     try:
-        # 查询：联表 sentiment_results 和 events_comments，使用 event_id
+        # 获取 event_id 对应的 event_name
+        event = db.session.query(EventComment.event_name).filter(EventComment.id == event_id).first()
+        if not event:
+            logger.warning(f"No event found for event_id: {event_id}")
+            return jsonify({"dates": [], "positive": [], "negative": []}), 200
+
+        event_name = event.event_name
+        # 查询所有同 event_name 的 SentimentResult
         results = db.session.query(SentimentResult.comment_date, SentimentResult.sentiment).join(
             EventComment, SentimentResult.event_id == EventComment.id
-        ).filter(EventComment.id == event_id).all()
+        ).filter(EventComment.event_name == event_name).all()
 
         if not results:
-            logger.warning(f"No data found for event_id: {event_id}")
+            logger.warning(f"No data found for event_name: {event_name}")
             return jsonify({"dates": [], "positive": [], "negative": []}), 200
 
         # 转换为 DataFrame
         data = [{"comment_date": r.comment_date, "sentiment": r.sentiment} for r in results]
         df = pd.DataFrame(data)
-        logger.info(f"Retrieved {len(df)} records for event_id: {event_id}")
+        logger.info(f"Retrieved {len(df)} records for event_name: {event_name}")
 
         # 按日期分组，计算正/负面百分比
         df["date"] = pd.to_datetime(df["comment_date"]).dt.date
@@ -61,7 +68,7 @@ def trend_data(event_id):
             "positive": trend_data[1].tolist() if 1 in trend_data.columns else [0] * len(trend_data),
             "negative": trend_data[0].tolist() if 0 in trend_data.columns else [0] * len(trend_data)
         }
-        logger.info(f"Trend data for event_id {event_id}: {response}")
+        logger.info(f"Trend data for event_id {event_id} (event_name: {event_name}): {response}")
         return jsonify(response)
     except Exception as e:
         logger.error(f"Error processing trend for event_id {event_id}: {str(e)}")

@@ -12,3 +12,4 @@ def analyze():
     text = data['text']
     result = analyze_sentiment(text)
     return jsonify(result)
+

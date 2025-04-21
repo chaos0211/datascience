@@ -3,41 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sentiment Analysis Dashboard</title>
-    <link rel="stylesheet" href="/static/css/style.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>舆情事件图表</title>
+    <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
     <div class="container">
-        <h1>Sentiment Analysis Dashboard</h1>
-
-        <!-- 上传表单 -->
-        <div class="upload-section">
-            <h2>Upload Comment</h2>
-            <form id="upload-form">
-                <label for="event_name">Event Name:</label>
-                <input type="text" id="event_name" name="event_name" required><br>
-                <label for="event_date">Event Date (YYYY-MM-DD):</label>
-                <input type="text" id="event_date" name="event_date" required><br>
-                <label for="comment">Comment:</label>
-                <textarea id="comment" name="comment" required></textarea><br>
-                <label for="comment_date">Comment Date (YYYY-MM-DD HH:MM:SS):</label>
-                <input type="text" id="comment_date" name="comment_date"><br>
-                <button type="submit">Upload</button>
-            </form>
-            <button onclick="generateFakeData()">Generate Fake Data</button>
-        </div>
-
-        <!-- 下拉框和趋势图 -->
-        <div class="analysis-section">
-            <h2>Sentiment Trend</h2>
-            <label for="event_select">Select Event:</label>
-            <select id="event_select" onchange="updateTrend()">
+        <h1>Sentiment Analysis Chart</h1>
+        <div class="controls">
+            <label for="event-select">Select Event:</label>
+            <select id="event-select">
                 <option value="">-- Select an Event --</option>
             </select>
-            <canvas id="trendChart" width="800" height="400"></canvas>
+            <button id="generate-fake-data">Generate Fake Data</button>
+        </div>
+        <div class="chart-container">
+            <canvas id="sentiment-chart"></canvas>
         </div>
     </div>
-    <script src="/static/js/main.js"></script>
+    <script src="/js/chart.min.js"></script>
+    <script src="/js/cart.js"></script>
 </body>
 </html>

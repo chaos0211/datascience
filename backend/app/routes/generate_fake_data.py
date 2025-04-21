@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 import random
 import logging
 from flask import Blueprint, jsonify
-from app.models import db
+from app import db
 from app.models.sentiment import EventComment, SentimentResult
 from app.services.sentiment_service import analyze_sentiment
 
@@ -14,9 +14,10 @@ fake_bp = Blueprint('fake_data', __name__)
 
 
 def generate_fake_data_logic():
+    # 定义两个事件
     events = [
-        {"name": "TechPhone Launch", "date": "2025-04-14"},
-        {"name": "Movie Premiere", "date": "2025-04-15"}
+        {"name": "TechPhone", "date": "2025-04-14"},
+        {"name": "Movie", "date": "2025-04-15"}
     ]
     comment_templates = {
         1: [  # 正面
@@ -38,6 +39,8 @@ def generate_fake_data_logic():
     issues = ["Battery drains fast", "Too expensive", "Shipping delayed", "Screen flickers"]
 
     logger.info("Starting fake data generation")
+
+    # 生成 350 条评论
     for day in range(7):
         date = (datetime(2025, 4, 14) + timedelta(days=day)).strftime("%Y-%m-%d")
         sentiment_weights = [0.50, 0.20, 0.30] if day == 2 else [0.30, 0.30, 0.40]  # [负, 正, 中]
@@ -53,6 +56,7 @@ def generate_fake_data_logic():
                 issue=random.choice(issues) if sentiment == 0 else ""
             )
 
+            # 创建新的 EventComment
             event_comment = EventComment(
                 event_name=event["name"],
                 event_date=datetime.strptime(event["date"], "%Y-%m-%d").date(),
@@ -65,22 +69,31 @@ def generate_fake_data_logic():
             db.session.add(event_comment)
             db.session.flush()
 
-            sentiment_result = analyze_sentiment(comment)
-            sentiment = 0 if sentiment_result == "negative" else 1
+            # 创建 SentimentResult
+            sentiment_data = analyze_sentiment(comment)
+            sentiment_code = sentiment_data.get("code")
+            if sentiment_code == 2:
+                sentiment_code = 1
+
             sentiment_result = SentimentResult(
                 event_id=event_comment.id,
-                sentiment=sentiment,
+                sentiment=sentiment_code,
                 comment_date=event_comment.comment_date
             )
             db.session.add(sentiment_result)
+            logger.debug(f"Generated comment: {comment} | Sentiment: {sentiment_code} | Event ID: {event_comment.id}")
 
     db.session.commit()
-    logger.info("Fake data generation completed")
+    logger.info(f"Fake data generation completed. Events Comments: {EventComment.query.count()}, Sentiment Results: {SentimentResult.query.count()}")
 
 
 @fake_bp.route('/api/generate_fake_data', methods=['POST'])
 def generate_fake_data():
     try:
+        # 清空现有数据
+        # SentimentResult.query.delete()
+        # EventComment.query.delete()
+        # db.session.commit()
         generate_fake_data_logic()
         return jsonify({"message": "Fake data generated successfully"}), 201
     except Exception as e:

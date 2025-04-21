@@ -4,6 +4,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import classification_report, accuracy_score
 import joblib
 import os
+from metrics_storage import save_metrics_to_mysql
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(BASE_DIR, "data")
@@ -29,6 +30,17 @@ def train_model(train_df, test_df):
     y_pred = clf.predict(X_test_vec)
     print("准确率：", accuracy_score(y_test, y_pred))
     print("分类报告：\n", classification_report(y_test, y_pred))
+
+    # 提取并保存指标
+    report = classification_report(y_test, y_pred, output_dict=True)
+    macro_avg = report["macro avg"]
+    metrics = {
+        "Precision": round(macro_avg["precision"], 3),
+        "Recall": round(macro_avg["recall"], 3),
+        "F1-score": round(macro_avg["f1-score"], 3)
+    }
+
+    save_metrics_to_mysql("Logistic Regression", metrics)
 
     joblib.dump(clf, os.path.join(MODEL_DIR, "logistic_model.pkl"))
     joblib.dump(vectorizer, os.path.join(MODEL_DIR, "tfidf_vectorizer_logistic.pkl"))

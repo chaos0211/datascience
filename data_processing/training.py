@@ -4,6 +4,8 @@ from sklearn.naive_bayes import MultinomialNB
 from sklearn.metrics import classification_report, accuracy_score
 import joblib, os
 
+from data_processing.metrics_storage import save_metrics_to_mysql
+
 DATA_DIR = "data"
 MODEL_DIR = "models"
 os.makedirs(MODEL_DIR, exist_ok=True)
@@ -31,6 +33,17 @@ def train_model(train_df, test_df):
     y_pred = clf.predict(X_test_vec)
     print("准确率：", accuracy_score(y_test, y_pred))
     print("分类报告：\n", classification_report(y_test, y_pred))
+
+    # 提取并保存指标
+    report = classification_report(y_test, y_pred, output_dict=True)
+    macro_avg = report["macro avg"]
+    metrics = {
+        "Precision": round(macro_avg["precision"], 3),
+        "Recall": round(macro_avg["recall"], 3),
+        "F1-score": round(macro_avg["f1-score"], 3)
+    }
+
+    save_metrics_to_mysql("Naive Bayes", metrics)
 
     # 保存模型和向量器
     joblib.dump(clf, os.path.join(MODEL_DIR, "naive_bayes_model.pkl"))

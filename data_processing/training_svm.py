@@ -27,8 +27,8 @@ def train_model(texts, labels):
     report = classification_report(y_test, y_pred, output_dict=True)
     print("分类报告：\n", classification_report(y_test, y_pred))
 
-    # 保存模型和向量器
-    joblib.dump(pipeline, 'data_processing/models/svm_model.pkl')
+    # 保存模型和向量器，集成到单独的pkl文件
+    joblib.dump(pipeline, 'models/svm_model.pkl')
 
     # 保存指标到 MySQL
     macro_avg = report["macro avg"]

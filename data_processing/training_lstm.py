@@ -41,10 +41,10 @@ def train_model(texts, labels):
     print("分类报告：\n", classification_report(y_test, y_pred))
 
     # 保存模型结构和权重
-    model.save("data_processing/models/lstm_model.h5")
+    model.save("models/lstm_model.h5")
     # 保存 Tokenizer
     import pickle
-    with open("data_processing/models/lstm_tokenizer.pkl", "wb") as f:
+    with open("models/lstm_tokenizer.pkl", "wb") as f:
         pickle.dump(tokenizer, f)
 
     # 提取宏平均指标并写入数据库

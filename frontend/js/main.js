@@ -15,6 +15,10 @@ function analyze() {
       const box = document.getElementById("resultText");
       if (data.sentiment) {
         box.innerText = `情感判断结果：${data.sentiment.toUpperCase()}（代码：${data.code}）`;
+        if (data.probabilities) {
+          const probText = `\n置信度：\nNEGATIVE: ${data.probabilities.negative}%\nPOSITIVE: ${data.probabilities.positive}%`;
+          box.innerText += probText;
+        }
       } else {
         box.innerText = `错误：${data.error || "未知错误"}`;
       }

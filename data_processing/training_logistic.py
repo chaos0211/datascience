@@ -14,6 +14,8 @@ os.makedirs(MODEL_DIR, exist_ok=True)
 def load_data():
     train_df = pd.read_csv(os.path.join(DATA_DIR, "train.csv"))
     test_df = pd.read_csv(os.path.join(DATA_DIR, "test.csv"))
+    train_df = train_df[train_df["sentiment"].isin([0, 2])]
+    test_df = test_df[test_df["sentiment"].isin([0, 2])]
     return train_df, test_df
 
 def train_model(train_df, test_df):
@@ -29,10 +31,10 @@ def train_model(train_df, test_df):
 
     y_pred = clf.predict(X_test_vec)
     print("准确率：", accuracy_score(y_test, y_pred))
-    print("分类报告：\n", classification_report(y_test, y_pred))
+    print("分类报告：\n", classification_report(y_test, y_pred, labels=[0, 2], zero_division=0))
 
     # 提取并保存指标
-    report = classification_report(y_test, y_pred, output_dict=True)
+    report = classification_report(y_test, y_pred, output_dict=True, labels=[0, 2], zero_division=0)
     macro_avg = report["macro avg"]
     metrics = {
         "Precision": round(macro_avg["precision"], 3),

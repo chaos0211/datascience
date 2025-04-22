@@ -1,20 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>舆情事件图表</title>
-    <link rel="stylesheet" href="/css/style.css">
-</head>
-<body>
+{% extends "base.html" %}
+
+{% block content %}
     <div class="container">
-        <h1>Sentiment Analysis Chart</h1>
+        <h1>舆论监控表</h1>
         <div class="controls">
-            <label for="event-select">Select Event:</label>
+            <label for="event-select">选择事件:</label>
             <select id="event-select">
                 <option value="">-- Select an Event --</option>
             </select>
-            <button id="generate-fake-data">Generate Fake Data</button>
+            <button id="generate-fake-data", style="display: none;">生成虚拟数据</button>
         </div>
         <div class="chart-container">
             <canvas id="sentiment-chart"></canvas>
@@ -22,5 +16,4 @@
     </div>
     <script src="/js/chart.min.js"></script>
     <script src="/js/cart.js"></script>
-</body>
-</html>
+{% endblock %}

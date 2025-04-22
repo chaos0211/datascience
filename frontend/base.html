@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>情感分析系统</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="/js/echarts.min.js"></script>
+    <script src="/js/main.js" defer></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .navbar {
+            background-color: #f9f9f9;
+            border-bottom: 1px solid #ccc;
+            padding: 10px 0;
+            display: flex;
+            justify-content: center;
+        }
+        .nav-center {
+            display: flex;
+            gap: 20px;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .nav-link {
+            text-decoration: none;
+            padding: 10px 20px;
+            border: 2px solid #007bff;
+            border-radius: 6px;
+            color: #007bff;
+            background-color: white;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .nav-link:hover {
+            background-color: #e6f0ff;
+        }
+        .nav-link.active {
+            background-color: #007bff;
+            color: white;
+        }
+        main {
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <ul class="nav-center">
+            <li><a href="/" class="nav-link" id="home-link">情感分析系统</a></li>
+            <li><a href="/model_compare" class="nav-link" id="compare-link">模型性能对比</a></li>
+            <li><a href="/cart" class="nav-link" id="cart-link">情感分析表</a></li>
+        </ul>
+    </nav>
+
+    <main id="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <script>
+        const currentPath = window.location.pathname;
+        document.querySelectorAll('.nav-link').forEach(link => {
+            if (link.getAttribute('href') === currentPath) {
+                link.classList.add('active');
+            } else {
+                link.classList.remove('active');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,4 +1,4 @@
-from flask import Flask, send_from_directory
+from flask import Flask, send_from_directory, render_template
 from flask_sqlalchemy import SQLAlchemy
 from config import Config
 from flask_migrate import Migrate
@@ -8,7 +8,8 @@ db = SQLAlchemy()
 migrate = Migrate()
 
 def create_app():
-    app = Flask(__name__)
+    template_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'frontend'))
+    app = Flask(__name__, template_folder=template_dir)
     app.config.from_object(Config)
 
     db.init_app(app)
@@ -29,17 +30,19 @@ def create_app():
 
     @app.route('/')
     def index():
-        frontend_path = os.path.abspath(os.path.join(app.root_path, '..', '..', 'frontend'))
-        return send_from_directory(frontend_path, 'index.html')
+        return render_template('index.html')
 
     @app.route('/<path:filename>')
     def static_files(filename):
         frontend_path = os.path.abspath(os.path.join(app.root_path, '..', '..', 'frontend'))
         return send_from_directory(frontend_path, filename)
+    #
+    @app.route('/model_compare', methods=['GET'])
+    def compare_page():
+        return render_template('model_compare.html')
     @app.route('/cart')
     def cart():
-        frontend_path = os.path.abspath(os.path.join(app.root_path, '..', '..', 'frontend'))
-        return send_from_directory(frontend_path, 'cart.html')
+        return render_template('cart.html')
 
 
     return app
